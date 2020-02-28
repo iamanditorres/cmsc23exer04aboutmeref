@@ -8,57 +8,61 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import com.example.aboutme.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private val myName: MyName = MyName("Andi Torres")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        findViewById<Button>(R.id.done_button).setOnClickListener{addNickname(it)}
-        findViewById<TextView>(R.id.nickname_text).setOnClickListener{updateNickname(it)}
+        binding.myName = myName
+
+        binding.doneButton.setOnClickListener{addNickname()}
+        findViewById<TextView>(R.id.nickname_text).setOnClickListener{updateNickname()}
     }
 
-    private fun addNickname(view: View){
-        val editText = findViewById<EditText>(R.id.nickname_edit)
-        val nicknameTextView = findViewById<TextView>(R.id.nickname_text)
+    private fun addNickname(){
+        binding.apply {
+            // set input text into TextView
+            myName?.nickname= nicknameEdit.text.toString()
+            invalidateAll()
 
-        // set input text into TextView
-        nicknameTextView.text = editText.text
+            // hide PlainText
+            binding.nicknameEdit.visibility = View.GONE
 
-        // hide PlainText
-        editText.visibility = View.GONE
+            // hide Button
+            binding.doneButton.visibility = View.GONE
 
-        // hide Button
-        view.visibility = View.GONE
+            // show TextView
+            binding.nicknameText.visibility = View.VISIBLE
 
-        // show TextView
-        nicknameTextView.visibility = View.VISIBLE
+        }
 
         // hide Keyboard
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+        inputMethodManager.hideSoftInputFromWindow(binding.doneButton.windowToken, 0)
     }
 
-    private fun updateNickname(view: View){
-        val editText = findViewById<EditText>(R.id.nickname_edit)
-        val nicknameTextView = findViewById<Button>(R.id.done_button)
-
+    private fun updateNickname(){
         // show PlainText
-        editText.visibility = View.VISIBLE
+        binding.nicknameEdit.visibility = View.VISIBLE
 
         // show Button
-        done_button.visibility = View.VISIBLE
+        binding.doneButton.visibility = View.VISIBLE
 
         // hide TextView
-        view.visibility = View.GONE
+        binding.nicknameText.visibility = View.GONE
 
         // set focus to PlainText
-        editText.requestFocus()
+        binding.nicknameEdit.requestFocus()
 
         // show the Keyboard
         val imn = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imn.showSoftInput(editText, 0)
+        imn.showSoftInput(binding.nicknameEdit, 0)
     }
 }
